@@ -1,25 +1,24 @@
-package quiz1;
+package quiz2;
 
-/* 所谓权重，就是让小树和大树平衡一点
-   节点少的树，一定要做节点多的大树的子树 */
-public class WeightedQuickUnionUF {
+public class WeightedQuickUnionWithFindUF {
     /* ids[p] = q means the root of P-th Node is Q-th Node */
     private int[] ids;
 
     /* size[i] means number of objects in the tree rooted at i */
     private int[] size;
 
-    /* the number of connected elements */
-    private int count;
+    /* 以i为根的连通分量所包含的最大值 */
+    private int[] maxValues;
 
-    public WeightedQuickUnionUF(int N) {
+    public WeightedQuickUnionWithFindUF(int N) {
         ids = new int[N];
         size = new int[N];
+        maxValues = new int[N];
         for (int i = 0; i < N; i++) {
             ids[i] = i;
             size[i] = 1;
+            maxValues[i] = i;
         }
-        count = N;
     }
 
     private int getRoot(int i) {
@@ -34,6 +33,7 @@ public class WeightedQuickUnionUF {
     }
 
     /* 有效控制了树的高度，getRoot方法不会达到O(n)级别 */
+    /* the root of p is q */
     public void union(int p, int q) {
         int pRoot = getRoot(p);
         int qRoot = getRoot(q);
@@ -43,15 +43,21 @@ public class WeightedQuickUnionUF {
         if (size[pRoot] < size[qRoot]) {
             ids[pRoot] = qRoot;
             size[qRoot] += size[pRoot];
+            if (maxValues[qRoot] < p) {
+                maxValues[qRoot] = p;
+            }
         } else {
             ids[qRoot] = pRoot;
             size[pRoot] += size[qRoot];
+            if (maxValues[pRoot] < q) {
+                maxValues[pRoot] = q;
+            }
         }
-        count --;
     }
 
-    /* 获得当前连通分量的个数 */
-    public int count() {
-        return this.count;
+    /* find the max element in the connected component containing i */
+    public int find(int i) {
+        return maxValues[getRoot(i)];
     }
+
 }
